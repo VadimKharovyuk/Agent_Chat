@@ -39,12 +39,16 @@ Agent Chat дозволяє це перевірити — задаєш тему,
 | Компонент | Технологія |
 |---|---|
 | Backend | Java 21, Spring Boot 4.0.6 |
-| AI Framework | Spring AI 2.0.0-M5 |
+| AI Framework | Spring AI 2.0.0-M3 |
 | LLM (local) | Ollama (qwen3:8b / llama3.1:8b) |
 | LLM (prod) | OpenRouter (deepseek/deepseek-chat) |
 | Database | PostgreSQL |
 | Frontend | Thymeleaf, Bootstrap 5 |
-| Tool | Wikipedia Search API |
+| 🌍 Tool | Wikipedia Search API (EN) |
+| 🔍 Tool | Tavily Search API |
+| 📰 Tool | NewsAPI |
+| 📈 Tool | Alpha Vantage (акції) |
+| 📚 Tool | ArXiv (наукові статті) |
 
 ---
 
@@ -152,8 +156,6 @@ APP_AGENT_EXPERIMENT_ENABLED=true
 
 ---
 
-Допиши в README.md после блока Wikipedia:
-
 ```markdown
 ## 🌐 Пошук в інтернеті
 
@@ -172,8 +174,7 @@ APP_AGENT_EXPERIMENT_ENABLED=true
 Щоб активувати пошук — додай у промпт:
 
 ```
-Перед відповіддю шукай факти в інтернеті або Wikipedia.
-Використовуй реальні дані — не вигадуй цифри і статистику.
+
 ```
 
 **Приклади використання інструментів:**
