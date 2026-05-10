@@ -1,4 +1,3 @@
-
 ```markdown
 # 🤖 Agent Chat
 
@@ -14,7 +13,7 @@
 ## 💡 Ідея
 
 Що буде якщо два AI з протилежними поглядами почнуть сперечатись?
-Agent Chat дозволяє це перевірити — задаєш тему, пишеш характери агентів і спостерігаєш як вони ведуть діалог.
+Agent Chat дозволяє це перевірити — задаєш тему, пишеш характери агентів і спостерігаєш як вони ведуть діалог в реальному часі.
 
 Агенти можуть звертатись до **Wikipedia** щоб підкріплювати аргументи реальними фактами замість того щоб вигадувати дані.
 
@@ -41,7 +40,7 @@ Agent Chat дозволяє це перевірити — задаєш тему,
 |---|---|
 | Backend | Java 21, Spring Boot 4.0.6 |
 | AI Framework | Spring AI 2.0.0-M5 |
-| LLM (local) | Ollama (qwen3:8b) |
+| LLM (local) | Ollama (qwen3:8b / llama3.1:8b) |
 | LLM (prod) | OpenRouter (deepseek/deepseek-chat) |
 | Database | PostgreSQL |
 | Frontend | Thymeleaf, Bootstrap 5 |
@@ -58,11 +57,31 @@ Agent Chat дозволяє це перевірити — задаєш тему,
 - PostgreSQL
 - Ollama
 
-### 2. Ollama
+### 2. Ollama — вибери модель
+
+| Модель | Час відповіді | Якість | Команда |
+|---|---|---|---|
+| `qwen3:8b` | 2+ хв | ⭐⭐⭐ Краще слідує інструкціям | `ollama pull qwen3:8b` |
+| `llama3.1:8b` | 20-30 сек | ⭐⭐ Швидше але слабше | `ollama pull llama3.1:8b` |
 
 ```bash
+# Якісне тестування (рекомендовано)
 ollama pull qwen3:8b
+
+# АБО швидке тестування логіки
+ollama pull llama3.1:8b
+
 ollama serve
+```
+
+Вкажи модель в `application-local.properties`:
+
+```properties
+# Якісне тестування (рекомендовано)
+spring.ai.ollama.chat.model=${OLLAMA_CHAT_MODEL:qwen3:8b}
+
+# АБО швидке тестування
+# spring.ai.ollama.chat.model=${OLLAMA_CHAT_MODEL:llama3.1:8b}
 ```
 
 ### 3. База даних
@@ -89,25 +108,60 @@ mvn spring-boot:run
 
 Відкрий браузер: `http://localhost:1024`
 
+---
+
+## 🌐 Деплой на Railway
+
+Встанови env vars:
+
+```
+SPRING_PROFILES_ACTIVE=openai
+OPENAI_API_KEY=your_openrouter_key
+DB_URL=jdbc:postgresql://...
+DB_USERNAME=postgres
+DB_PASSWORD=your_password
+APP_AGENT_EXPERIMENT_ENABLED=true
+```
+
+---
 
 ## ✍️ Як написати хороший промпт
 
 Промпт має містити:
-- **Роль** — хто цей агент
-- **Позиція** — що він відстоює
-- **Заборони** — з чим він НІКОЛИ не погоджується
-- **Формат** — коротко, питання в кінці
-- **Мова** — вкажи явно
 
-**Приклад:**
+- **Роль** — хто цей агент, його характер і переконання
+- **Позиція** — що він відстоює і у що вірить
+- **Заборони** — з чим він НІКОЛИ не погоджується
+- **Формат** — коротко, з фактами, питання в кінці
+- **Мова** — вкажи явно українська / російська / англійська
+
+**Приклад хорошого промпту:**
+
 ```
 Ти жорсткий капіталіст, мільярдер, власник корпорації.
 Віриш що вільний ринок — єдиний шлях до процвітання.
 Перед відповіддю шукай у Wikipedia факти про ВВП, рівень життя.
 НІКОЛИ не погоджуйся з комуністичними ідеями.
-Відповідай коротко — 2-3 речення. Закінчуй провокаційним питанням.
+Говори цифрами і фактами. Зневажаєш планову економіку.
+Відповідай коротко — 2-3 речення.
+Закінчуй провокаційним питанням.
 Відповідай ТІЛЬКИ українською мовою.
 ```
+
+> 💡 Чим чіткіша роль і чим жорсткіша заборона погоджуватись — тим живіший діалог
+
+---
+
+## 🌐 Wikipedia пошук
+
+Агенти мають доступ до Wikipedia і можуть самостійно шукати факти під час розмови.
+Щоб активувати — додай у промпт:
+
+```
+Перед відповіддю шукай у Wikipedia факти про [тему]
+```
+
+Модель сама вирішить коли і що шукати.
 
 ---
 
@@ -116,7 +170,7 @@ mvn spring-boot:run
 ```
 src/main/java/com/example/agent_chat/
 ├── config/
-│   └── AiProviderConfig.java        # Ollama / OpenRouter провайдери
+│   └── AiProviderConfig.java          # Ollama / OpenRouter провайдери
 ├── controller/
 │   ├── HomeController.java
 │   └── AgentConversationController.java
@@ -130,8 +184,8 @@ src/main/java/com/example/agent_chat/
 │   └── AgentMessageRepository.java
 ├── service/
 │   ├── AgentConversationService.java
-│   ├── AgentConversationRunner.java  # @Async цикл
-│   └── WikipediaSearchTool.java      # Wikipedia @Tool
+│   ├── AgentConversationRunner.java   # @Async цикл діалогу
+│   └── WikipediaSearchTool.java       # Wikipedia @Tool
 └── dto/
     ├── StartConversationRequest.java
     ├── ConversationResponse.java
@@ -141,8 +195,39 @@ src/main/java/com/example/agent_chat/
 
 ---
 
+## 👨‍💻 Автор
+
+**Vadim Kharovyuk** — Java Backend розробник
+
+Спеціалізується на побудові AI-продуктів на базі Spring Boot та Spring AI.
+Досвід з RAG архітектурою, LLM інтеграціями, single-tenant SaaS системами.
+
+- 🌐 [Про автора](https://webscraft.org/blog/java-backend-rozrobnik-vadim-harovyuk)
+- 💬 Telegram: [@name_lucky_lucky](https://t.me/name_lucky_lucky)
+- 💻 GitHub: [VadimKharovyuk](https://github.com/VadimKharovyuk)
+
+---
+
+## 🚀 Основний проект — AskYourDocs
+
+Agent Chat є частиною екосистеми AI інструментів які розробляє автор.
+
+### [AskYourDocs](https://askyourdocs.org/uk/) — корпоративна база знань на основі AI
+
+> Завантажуй документи — отримуй точні відповіді миттєво
+
+- 📄 Підтримка PDF, DOCX, TXT документів
+- 🤖 AI асистент відповідає на питання по твоїх документах
+- 🔍 Гібридний пошук — векторний + BM25 з Reciprocal Rank Fusion
+- 🏢 Ідеально для юридичних фірм, медичних центрів, дистриб'юторів
+- 🔒 Single-tenant архітектура — повна ізоляція даних кожного клієнта
+- 🌍 Мультимовний інтерфейс — українська, англійська, німецька, іспанська
+
+👉 **[askyourdocs.org](https://askyourdocs.org/uk/)**
+
+---
+
 ## 📄 Ліцензія
 
 MIT License — використовуй вільно для навчання та експериментів.
 ```
-
