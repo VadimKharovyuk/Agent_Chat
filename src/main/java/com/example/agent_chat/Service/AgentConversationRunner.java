@@ -76,7 +76,6 @@ public class AgentConversationRunner {
             }
 
             // Agent A
-            // Agent A
             List<AgentMessage> historyA = messageRepository
                     .findByConversationIdOrderByRoundNumberAsc(conversationId);
             String replyA = ask(systemPromptA, historyA, message, AgentSender.AGENT_A);
@@ -143,11 +142,7 @@ public class AgentConversationRunner {
 
         ToolCallback[] tools = ToolCallbacks.from(wikipediaSearchTool);
 
-        return agentChatModel.call(
-                        new Prompt(messages,
-                                ToolCallingChatOptions.builder()
-                                        .toolCallbacks(tools)
-                                        .build()))
+        return agentChatModel.call(new Prompt(messages))
                 .getResult()
                 .getOutput()
                 .getText();

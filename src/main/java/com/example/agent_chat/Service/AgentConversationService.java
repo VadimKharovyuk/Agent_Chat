@@ -6,6 +6,7 @@ import com.example.agent_chat.model.AgentConversation;
 import com.example.agent_chat.model.ConversationStatus;
 import com.example.agent_chat.repository.AgentConversationRepository;
 import com.example.agent_chat.repository.AgentMessageRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;

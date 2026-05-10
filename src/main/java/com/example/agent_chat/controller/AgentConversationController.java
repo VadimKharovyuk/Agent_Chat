@@ -3,13 +3,14 @@ import com.example.agent_chat.Service.AgentConversationService;
 import com.example.agent_chat.dto.ConversationResponse;
 import com.example.agent_chat.dto.StartConversationRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@Slf4j
 @Controller
 @RequestMapping("/admin/experiment")
 @RequiredArgsConstructor
@@ -72,6 +73,7 @@ public class AgentConversationController {
     @GetMapping("/{id}")
     public String view(@PathVariable Long id, Model model) {
         ConversationResponse conversation = service.findById(id);
+        log.info("Conversation started with id: {}", id); // ← добавь
         model.addAttribute("conversation", conversation);
         return "experiment/view";
     }
