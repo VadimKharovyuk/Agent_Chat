@@ -37,7 +37,7 @@ public class TavilySearchTool {
 
         try {
             TavilyRequest request = new TavilyRequest(
-                    apiKey, query, "general", 3, false
+                    apiKey, query, "basic", 3, false
             );
 
             TavilyResponse response = restClient.post()

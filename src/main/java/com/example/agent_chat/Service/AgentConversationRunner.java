@@ -44,6 +44,10 @@ public class AgentConversationRunner {
     private final  WikipediaSearchTool wikipediaSearchTool;
     private final TavilySearchTool tavilySearchTool;
 
+    private final AlphaVantageTool alphaVantageTool;
+    private final ArxivSearchTool arxivSearchTool;
+    private final NewsApiSearchTool  newsApiSearchTool;
+
     private static final int HISTORY_SIZE = 8;
 
     public AgentConversationRunner(
@@ -51,13 +55,19 @@ public class AgentConversationRunner {
             AgentMessageRepository messageRepository,
             @Qualifier("agentChatModel") ChatModel agentChatModel,
             WikipediaSearchTool wikipediaSearchTool ,
-            TavilySearchTool tavilySearch) {
+            TavilySearchTool tavilySearch ,
+            AlphaVantageTool alphaVantageTool,
+            ArxivSearchTool arxivSearchTool,
+            NewsApiSearchTool newsApiSearchTool) {
+
         this.conversationRepository = conversationRepository;
         this.messageRepository = messageRepository;
         this.agentChatModel = agentChatModel;
         this.wikipediaSearchTool = wikipediaSearchTool;
-
         this.tavilySearchTool =tavilySearch;
+        this.alphaVantageTool = alphaVantageTool;
+        this.arxivSearchTool = arxivSearchTool ;
+        this.newsApiSearchTool =newsApiSearchTool;
     }
 
 
@@ -145,7 +155,11 @@ public class AgentConversationRunner {
 
         ToolCallback[] tools = ToolCallbacks.from(
                 wikipediaSearchTool,
-                tavilySearchTool
+                tavilySearchTool,
+                alphaVantageTool,
+                arxivSearchTool,
+                newsApiSearchTool
+
         );
         return agentChatModel.call(
                         new Prompt(messages,
