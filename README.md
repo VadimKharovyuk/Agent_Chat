@@ -89,22 +89,6 @@ mvn spring-boot:run
 
 Відкрий браузер: `http://localhost:1024`
 
----
-
-## 🌐 Деплой на Railway
-
-Встанови env vars:
-
-```
-SPRING_PROFILES_ACTIVE=openai
-OPENAI_API_KEY=your_openrouter_key
-DB_URL=jdbc:postgresql://...
-DB_USERNAME=postgres
-DB_PASSWORD=your_password
-APP_AGENT_EXPERIMENT_ENABLED=true
-```
-
----
 
 ## ✍️ Як написати хороший промпт
 
