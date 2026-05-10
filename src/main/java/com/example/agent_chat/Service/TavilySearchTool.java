@@ -37,9 +37,8 @@ public class TavilySearchTool {
 
         try {
             TavilyRequest request = new TavilyRequest(
-                    apiKey, query, "basic", 3, false
+                    apiKey, query, 3, false
             );
-
             TavilyResponse response = restClient.post()
                     .uri("/search")
                     .header("Content-Type", "application/json")
@@ -71,7 +70,6 @@ public class TavilySearchTool {
     record TavilyRequest(
             String api_key,
             String query,
-            String search_depth,
             int max_results,
             boolean include_answer
     ) {}
