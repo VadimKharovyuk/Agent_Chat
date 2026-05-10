@@ -136,40 +136,84 @@ public class AgentConversationRunner {
 
     // ── хелперы ───────────────────────────────────────────────────────────
 
-    private String ask(String systemPrompt, List<AgentMessage> history,
-                       String lastMessage, AgentSender currentSender) {
-        List<org.springframework.ai.chat.messages.Message> messages = new ArrayList<>();
-        messages.add(new SystemMessage(systemPrompt));
+//    private String ask(String systemPrompt, List<AgentMessage> history,
+//                       String lastMessage, AgentSender currentSender) {
+//        List<org.springframework.ai.chat.messages.Message> messages = new ArrayList<>();
+//        messages.add(new SystemMessage(systemPrompt));
+//
+//        history.stream()
+//                .skip(Math.max(0, history.size() - HISTORY_SIZE))
+//                .forEach(m -> {
+//                    if (m.getSender() == currentSender) {
+//                        messages.add(new AssistantMessage(m.getContent()));
+//                    } else {
+//                        messages.add(new UserMessage(m.getContent()));
+//                    }
+//                });
+//
+//        messages.add(new UserMessage(lastMessage));
+//
+//        ToolCallback[] tools = ToolCallbacks.from(
+//                wikipediaSearchTool,
+//                tavilySearchTool,
+//                alphaVantageTool,
+//                arxivSearchTool,
+//                newsApiSearchTool
+//
+//        );
+//        return agentChatModel.call(
+//                        new Prompt(messages,
+//                                ToolCallingChatOptions.builder()
+//                                        .toolCallbacks(tools)
+//                                        .build()))
+//                .getResult()
+//                .getOutput()
+//                .getText();
+//
+//
+//    }
+private String ask(String systemPrompt, List<AgentMessage> history,
+                   String lastMessage, AgentSender currentSender) {
+    List<org.springframework.ai.chat.messages.Message> messages = new ArrayList<>();
+    messages.add(new SystemMessage(systemPrompt));
 
-        history.stream()
-                .skip(Math.max(0, history.size() - HISTORY_SIZE))
-                .forEach(m -> {
-                    if (m.getSender() == currentSender) {
-                        messages.add(new AssistantMessage(m.getContent()));
-                    } else {
-                        messages.add(new UserMessage(m.getContent()));
-                    }
-                });
+    history.stream()
+            .skip(Math.max(0, history.size() - HISTORY_SIZE))
+            .forEach(m -> {
+                if (m.getSender() == currentSender) {
+                    messages.add(new AssistantMessage(m.getContent()));
+                } else {
+                    messages.add(new UserMessage(m.getContent()));
+                }
+            });
 
-        messages.add(new UserMessage(lastMessage));
+    messages.add(new UserMessage(lastMessage));
 
-        ToolCallback[] tools = ToolCallbacks.from(
-                wikipediaSearchTool,
-                tavilySearchTool,
-                alphaVantageTool,
-                arxivSearchTool,
-                newsApiSearchTool
+    ToolCallback[] tools = ToolCallbacks.from(
+            wikipediaSearchTool,
+            tavilySearchTool,
+            newsApiSearchTool,
+            alphaVantageTool,
+            arxivSearchTool
+    );
 
-        );
-        return agentChatModel.call(
-                        new Prompt(messages,
-                                ToolCallingChatOptions.builder()
-                                        .toolCallbacks(tools)
-                                        .build()))
-                .getResult()
-                .getOutput()
-                .getText();
+    String response = agentChatModel.call(
+                    new Prompt(messages,
+                            ToolCallingChatOptions.builder()
+                                    .toolCallbacks(tools)
+                                    .build()))
+            .getResult()
+            .getOutput()
+            .getText();
 
+    // убираем <think>...</think> блок из ответа
+    return removeThinkingBlock(response);
+}
+
+    private String removeThinkingBlock(String text) {
+        if (text == null) return "";
+        // убираем <think>...</think> включая многострочные блоки
+        return text.replaceAll("(?s)<think>.*?</think>", "").trim();
     }
 
     private void saveMessage(AgentConversation conversation,

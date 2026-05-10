@@ -2,6 +2,7 @@ package com.example.agent_chat.Service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -18,6 +19,10 @@ public class NewsApiSearchTool {
         this.apiKey = apiKey;
         this.restClient = RestClient.builder()
                 .baseUrl("https://newsapi.org/v2")
+                .requestFactory(new SimpleClientHttpRequestFactory() {{
+                    setConnectTimeout(5000);
+                    setReadTimeout(5000);
+                }})
                 .build();
     }
 

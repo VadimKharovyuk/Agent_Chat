@@ -1,8 +1,9 @@
 package com.example.agent_chat.controller;
+
 import com.example.agent_chat.Service.AgentConversationService;
+import com.example.agent_chat.Service.TopicGeneratorService;
 import com.example.agent_chat.dto.ConversationResponse;
 import com.example.agent_chat.dto.StartConversationRequest;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Controller;
@@ -10,10 +11,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @Slf4j
 @Controller
 @RequestMapping("/admin/experiment")
-@RequiredArgsConstructor
 @ConditionalOnProperty(
         name = "app.agent.experiment.enabled",
         havingValue = "true",
@@ -22,6 +23,7 @@ import java.util.List;
 public class AgentConversationController {
 
     private static final String DEFAULT_PROMPT_A = """
+            /think
             Ти переконаний альтруїст і гуманіст.
             Вважаєш що сенс життя — служіння іншим людям.
             Егоїзм руйнує суспільство і веде до самотності.
@@ -33,6 +35,7 @@ public class AgentConversationController {
             """;
 
     private static final String DEFAULT_PROMPT_B = """
+            /think
             Ти жорсткий егоїст і послідовник Айн Ренд.
             Вважаєш що людина повинна жити виключно заради себе.
             Альтруїзм — це слабкість і маніпуляція.
@@ -44,8 +47,15 @@ public class AgentConversationController {
             """;
 
     private final AgentConversationService service;
+    private final TopicGeneratorService topicGeneratorService;
 
-    // ── Список всех разговоров ────────────────────────────────────────────
+    public AgentConversationController(AgentConversationService service,
+                                       TopicGeneratorService topicGeneratorService) {
+        this.service = service;
+        this.topicGeneratorService = topicGeneratorService;
+    }
+
+    // ── Список розмов ─────────────────────────────────────────────────────
 
     @GetMapping
     public String list(Model model) {
@@ -54,13 +64,30 @@ public class AgentConversationController {
         return "experiment/list";
     }
 
-    // ── Форма нового разговора ────────────────────────────────────────────
+    // ── Форма нової розмови ───────────────────────────────────────────────
 
     @GetMapping("/new")
     public String newForm(Model model) {
         model.addAttribute("defaultPromptA", DEFAULT_PROMPT_A);
         model.addAttribute("defaultPromptB", DEFAULT_PROMPT_B);
         return "experiment/new";
+    }
+
+    // ── Генерація теми ────────────────────────────────────────────────────
+
+    @GetMapping("/generate-topic")
+    @ResponseBody
+    public String generateTopic() {
+        return topicGeneratorService.generateTopic();
+    }
+
+    // ── Генерація промптів ────────────────────────────────────────────────
+
+    @GetMapping("/generate-prompts")
+    @ResponseBody
+    public TopicGeneratorService.GeneratedPrompts generatePrompts(
+            @RequestParam String topic) {
+        return topicGeneratorService.generatePrompts(topic);
     }
 
     // ── Запуск ────────────────────────────────────────────────────────────
@@ -70,15 +97,16 @@ public class AgentConversationController {
                         @RequestParam String systemPromptA,
                         @RequestParam String systemPromptB,
                         @RequestParam(defaultValue = "100") int maxRounds) {
-
+        log.info("Starting conversation | topic='{}'", topic);
         StartConversationRequest request = new StartConversationRequest(
                 topic, systemPromptA, systemPromptB, maxRounds
         );
         Long id = service.start(request);
+        log.info("Conversation started with id: {}", id);
         return "redirect:/admin/experiment/" + id;
     }
 
-    // ── Просмотр диалога ──────────────────────────────────────────────────
+    // ── Перегляд діалогу ──────────────────────────────────────────────────
 
     @GetMapping("/{id}")
     public String view(@PathVariable Long id, Model model) {
