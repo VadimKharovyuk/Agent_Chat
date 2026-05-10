@@ -1,5 +1,4 @@
 package com.example.agent_chat.Service;
-
 import com.example.agent_chat.model.AgentConversation;
 import com.example.agent_chat.model.AgentMessage;
 import com.example.agent_chat.model.AgentSender;
@@ -142,10 +141,15 @@ public class AgentConversationRunner {
 
         ToolCallback[] tools = ToolCallbacks.from(wikipediaSearchTool);
 
-        return agentChatModel.call(new Prompt(messages))
+        return agentChatModel.call(
+                        new Prompt(messages,
+                                ToolCallingChatOptions.builder()
+                                        .toolCallbacks(tools)
+                                        .build()))
                 .getResult()
                 .getOutput()
                 .getText();
+
     }
 
     private void saveMessage(AgentConversation conversation,

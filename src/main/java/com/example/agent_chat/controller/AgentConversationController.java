@@ -73,7 +73,6 @@ public class AgentConversationController {
     @GetMapping("/{id}")
     public String view(@PathVariable Long id, Model model) {
         ConversationResponse conversation = service.findById(id);
-        log.info("Conversation started with id: {}", id); // ← добавь
         model.addAttribute("conversation", conversation);
         return "experiment/view";
     }
