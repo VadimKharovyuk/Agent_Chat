@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Новый разговор</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+<div class="container py-4" style="max-width: 700px;">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0">🤖 Новый разговор</h4>
+        <a href="/admin/experiment" class="btn btn-outline-secondary btn-sm">← Назад</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form action="/admin/experiment/start" method="post">
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Тема разговора</label>
+                    <input type="text" name="topic" class="form-control"
+                           placeholder="Как AI изменит мир через 10 лет?" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">🎓 Промпт агента A</label>
+                    <textarea name="systemPromptA" class="form-control" rows="4"
+                              th:text="${defaultPromptA}"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">🚀 Промпт агента B</label>
+                    <textarea name="systemPromptB" class="form-control" rows="4"
+                              th:text="${defaultPromptB}"></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Макс. раундов</label>
+                    <input type="number" name="maxRounds" class="form-control"
+                           value="100" min="1" max="100" style="width: 120px;">
+                </div>
+
+                <button type="submit" class="btn btn-primary">▶ Запустить</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

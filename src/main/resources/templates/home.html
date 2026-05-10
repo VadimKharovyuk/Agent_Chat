@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Agent Chat</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body { background: #f0f2f5; }
+
+        .hero {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            padding: 80px 0;
+        }
+
+        .hero h1 { font-size: 3rem; font-weight: 800; }
+        .hero p  { font-size: 1.2rem; opacity: 0.8; }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: #1a1a2e;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 16px;
+            padding: 28px;
+            height: 100%;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+
+        .feature-card h6 {
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .prompt-box {
+            background: #1a1a2e;
+            color: #a8d8a8;
+            border-radius: 12px;
+            padding: 20px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            white-space: pre-line;
+        }
+
+        .step-number {
+            width: 36px;
+            height: 36px;
+            background: #0f3460;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .step-item:last-child { border-bottom: none; }
+
+        .step-text strong { color: #1a1a2e; display: block; margin-bottom: 4px; }
+        .step-text span   { color: #6c757d; font-size: 0.9rem; }
+
+        .badge-rule {
+            background: #e8f0fe;
+            color: #0f3460;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin: 4px;
+        }
+
+        .wiki-card {
+            background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+            border-radius: 16px;
+            padding: 28px;
+            border: 1px solid #c8e6c9;
+        }
+
+        .terms-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f2f5;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .terms-item:last-child { border-bottom: none; }
+        .terms-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+
+        .cta-section {
+            background: linear-gradient(135deg, #0f3460, #1a1a2e);
+            border-radius: 24px;
+            padding: 48px;
+            text-align: center;
+            color: white;
+        }
+
+        .btn-cta {
+            background: white;
+            color: #0f3460;
+            font-weight: 700;
+            padding: 14px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            border: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-cta:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            color: #0f3460;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── HERO ─────────────────────────────────────────────────────── -->
+<section class="hero text-center">
+    <div class="container">
+        <div class="mb-3" style="font-size: 4rem;">🤖</div>
+        <h1>Agent Chat</h1>
+        <p class="mx-auto" style="max-width: 560px;">
+            Два AI агенти з різними характерами та переконаннями ведуть діалог
+            на задану тему — в реальному часі
+        </p>
+        <a href="/admin/experiment" class="btn btn-light btn-lg px-5 mt-3 fw-bold">
+            🚀 Розпочати експеримент
+        </a>
+    </div>
+</section>
+
+<!-- ── ЯК ПРАЦЮЄ ─────────────────────────────────────────────────── -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="section-title text-center">⚙️ Як це працює</h2>
+        <div class="row g-4">
+
+            <div class="col-md-3 col-sm-6">
+                <div class="feature-card text-center">
+                    <div class="feature-icon">🎯</div>
+                    <h6>Задай тему</h6>
+                    <p>Будь-яке питання або твердження — філософія, економіка, технології</p>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <div class="feature-card text-center">
+                    <div class="feature-icon">✍️</div>
+                    <h6>Напиши промпти</h6>
+                    <p>Визнач роль, характер і правила поведінки для кожного агента</p>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <div class="feature-card text-center">
+                    <div class="feature-icon">▶️</div>
+                    <h6>Запусти</h6>
+                    <p>Агенти починають діалог автоматично — спостерігай в реальному часі</p>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <div class="feature-card text-center">
+                    <div class="feature-icon">📖</div>
+                    <h6>Читай історію</h6>
+                    <p>Всі розмови зберігаються в базі даних і доступні для перегляду</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ── ПРОМПТ ────────────────────────────────────────────────────── -->
+<section class="py-5" style="background: white;">
+    <div class="container">
+        <h2 class="section-title text-center">✍️ Як написати хороший промпт</h2>
+
+        <div class="row g-4 align-items-start">
+
+            <!-- Правила -->
+            <div class="col-md-5">
+                <div class="feature-card">
+                    <h6 class="mb-3">📋 Що має містити промпт</h6>
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-text">
+                            <strong>Роль</strong>
+                            <span>Хто цей агент — професор, бізнесмен, революціонер</span>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-text">
+                            <strong>Позиція</strong>
+                            <span>Що він відстоює і у що вірить</span>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-text">
+                            <strong>Заборони</strong>
+                            <span>З чим він НІКОЛИ не погоджується</span>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-text">
+                            <strong>Формат</strong>
+                            <span>Коротко, з фактами, питання в кінці</span>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">5</div>
+                        <div class="step-text">
+                            <strong>Мова</strong>
+                            <span>Вкажи явно — українська, російська, англійська</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <div class="badge-rule">НІКОЛИ не погоджуйся</div>
+                        <div class="badge-rule">Відповідай коротко</div>
+                        <div class="badge-rule">Закінчуй питанням</div>
+                        <div class="badge-rule">Тільки українською</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Пример промпта -->
+            <div class="col-md-7">
+                <div class="feature-card">
+                    <h6 class="mb-3">💡 Приклад хорошого промпту</h6>
+                    <div class="prompt-box">Ти жорсткий капіталіст, мільярдер, власник корпорації.
+                        Віриш що вільний ринок — єдиний шлях до процвітання.
+                        Перед відповіддю шукай у Wikipedia факти про
+                        зростання економіки, ВВП, рівень життя.
+                        НІКОЛИ не погоджуйся з комуністичними ідеями.
+                        Говори цифрами і фактами.
+                        Зневажаєш планову економіку.
+                        Відповідай коротко — 2-3 речення.
+                        Закінчуй провокаційним питанням.
+                        Відповідай ТІЛЬКИ українською мовою.</div>
+
+                    <p class="text-muted mt-3 mb-0" style="font-size: 0.85rem;">
+                        💡 Чим чіткіша роль і чим жорсткіша заборона погоджуватись —
+                        тим живіший і цікавіший діалог
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ── WIKIPEDIA ─────────────────────────────────────────────────── -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="wiki-card">
+                    <div class="row align-items-center">
+                        <div class="col-auto" style="font-size: 3rem;">🌐</div>
+                        <div class="col">
+                            <h5 class="fw-bold mb-1" style="color: #1a1a2e;">Wikipedia пошук</h5>
+                            <p class="text-muted mb-2">
+                                Агенти мають доступ до Wikipedia і можуть самостійно шукати
+                                факти під час розмови щоб підкріплювати аргументи реальними даними.
+                            </p>
+                            <div class="prompt-box" style="background: #2d5a27; font-size: 0.8rem;">Перед відповіддю шукай у Wikipedia факти про [тему]</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── УМОВИ ─────────────────────────────────────────────────────── -->
+<section class="py-5" style="background: white;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h2 class="section-title text-center">📋 Умови користування</h2>
+                <div class="feature-card">
+                    <div class="terms-item">
+                        <span class="terms-icon">✅</span>
+                        <span>Проект є відкритим експериментом — використовуй для навчання та досліджень</span>
+                    </div>
+                    <div class="terms-item">
+                        <span class="terms-icon">⚠️</span>
+                        <span>Агенти можуть помилятись і вигадувати факти — перевіряй важливу інформацію</span>
+                    </div>
+                    <div class="terms-item">
+                        <span class="terms-icon">🚫</span>
+                        <span>Не використовуй для генерації шкідливого або образливого контенту</span>
+                    </div>
+                    <div class="terms-item">
+                        <span class="terms-icon">💰</span>
+                        <span>Кожен запит використовує токени — не запускай нескінченні цикли без потреби</span>
+                    </div>
+                    <div class="terms-item">
+                        <span class="terms-icon">💾</span>
+                        <span>Всі розмови зберігаються в базі даних — не передавай особисті дані агентам</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── CTA ───────────────────────────────────────────────────────── -->
+<section class="py-5">
+    <div class="container">
+        <div class="cta-section">
+            <div style="font-size: 3rem;" class="mb-3">🤖 vs 🤖</div>
+            <h2 class="fw-bold mb-2">Готовий запустити перший діалог?</h2>
+            <p class="mb-4" style="opacity: 0.8;">
+                Задай тему, напиши промпти і спостерігай як два AI сперечаються між собою
+            </p>
+            <a href="/admin/experiment" class="btn btn-cta">
+                🚀 Розпочати експеримент
+            </a>
+        </div>
+    </div>
+</section>
+
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Диалог</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .msg-a { background: #e8f0fe; border-radius: 12px; }
+        .msg-b { background: #fde8e0; border-radius: 12px; }
+        .chat-box { max-height: 70vh; overflow-y: auto; }
+    </style>
+</head>
+<body class="bg-light">
+<div class="container py-4" style="max-width: 760px;">
+
+    <!-- Заголовок -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h5 class="mb-0" th:text="${conversation.topic}"></h5>
+            <small class="text-muted">
+                Раундов: <span th:text="${conversation.totalRounds}"></span> ·
+                <span th:text="${conversation.status}"></span> ·
+                <span th:text="${conversation.createdAt}"></span>
+            </small>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="/admin/experiment" class="btn btn-outline-secondary btn-sm">← Назад</a>
+            <form th:if="${conversation.status.name() == 'RUNNING'}"
+                  th:action="@{/admin/experiment/{id}/stop(id=${conversation.id})}"
+                  method="post">
+                <button class="btn btn-warning btn-sm">⏹ Стоп</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Чат -->
+    <div class="chat-box d-flex flex-column gap-3 mb-3" id="chatBox">
+
+        <div th:if="${conversation.messages.empty}" class="text-muted text-center py-5">
+            Сообщений пока нет — разговор начинается...
+        </div>
+
+        <div th:each="msg : ${conversation.messages}"
+             th:classappend="${msg.sender.name() == 'AGENT_A'} ? 'align-self-start' : 'align-self-end'"
+             style="max-width: 80%;">
+
+            <small class="text-muted ms-1">
+                <span th:text="${msg.sender.name() == 'AGENT_A'} ? '🎓 Профессор' : '🚀 Энтузиаст'"></span>
+                · раунд <span th:text="${msg.roundNumber}"></span>
+            </small>
+
+            <div th:classappend="${msg.sender.name() == 'AGENT_A'} ? 'msg-a' : 'msg-b'"
+                 class="p-3 mt-1">
+                <span th:text="${msg.content}"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Авто-обновление если RUNNING -->
+    <div th:if="${conversation.status.name() == 'RUNNING'}"
+         class="text-center text-muted small">
+        <span class="spinner-border spinner-border-sm me-1"></span>
+        Разговор идёт · страница обновится через <span id="countdown">10</span> сек
+    </div>
+
+</div>
+
+<script>
+    // скролл вниз
+    const box = document.getElementById('chatBox');
+    if (box) box.scrollTop = box.scrollHeight;
+
+    // countdown + авто-обновление если RUNNING
+    const countdown = document.getElementById('countdown');
+    if (countdown) {
+        let sec = 10;
+        setInterval(() => {
+            sec--;
+            countdown.textContent = sec;
+            if (sec <= 0) location.reload();
+        }, 1000);
+    }
+</script>
+</body>
+</html>
