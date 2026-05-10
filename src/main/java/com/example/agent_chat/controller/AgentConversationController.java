@@ -122,4 +122,10 @@ public class AgentConversationController {
         service.stop(id);
         return "redirect:/admin/experiment/" + id;
     }
+
+    @PostMapping("/{id}/delete")
+    public String delete(@PathVariable Long id) {
+        service.deleteById(id);
+        return "redirect:/admin/experiment";
+    }
 }

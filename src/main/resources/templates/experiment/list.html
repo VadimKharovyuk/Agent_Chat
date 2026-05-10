@@ -10,30 +10,45 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">🤖 Agent Experiments</h4>
-        <a href="/admin/experiment/new" class="btn btn-primary btn-sm">+ Новый разговор</a>
+        <a href="/admin/experiment/new" class="btn btn-primary btn-sm">+ Нова розмова</a>
     </div>
 
-    <div th:if="${conversations.empty}" class="text-muted">Разговоров пока нет.</div>
+    <div th:if="${conversations.empty}" class="text-muted">Розмов поки немає.</div>
 
     <div class="list-group" th:unless="${conversations.empty}">
-        <a th:each="c : ${conversations}"
-           th:href="@{/admin/experiment/{id}(id=${c.id})}"
-           class="list-group-item list-group-item-action">
+        <div th:each="c : ${conversations}"
+             class="list-group-item list-group-item-action">
 
             <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <strong th:text="${c.topic}"></strong>
-                    <small class="text-muted ms-2" th:text="${c.createdAt}"></small>
-                </div>
-                <span th:text="${c.status}"
-                      th:classappend="${c.status.name() == 'RUNNING'} ? 'badge bg-success' :
-                                      (${c.status.name() == 'STOPPED'} ? 'badge bg-warning text-dark' :
-                                      'badge bg-secondary')">
-                </span>
-            </div>
 
-            <small class="text-muted">Раундов: <span th:text="${c.totalRounds}"></span></small>
-        </a>
+                <!-- Ліва частина — клік переходить до діалогу -->
+                <a th:href="@{/admin/experiment/{id}(id=${c.id})}"
+                   class="text-decoration-none text-dark flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong th:text="${c.topic}"></strong>
+                            <small class="text-muted ms-2" th:text="${c.createdAt}"></small>
+                        </div>
+                        <span th:text="${c.status}"
+                              th:classappend="${c.status.name() == 'RUNNING'} ? 'badge bg-success' :
+                                              (${c.status.name() == 'STOPPED'} ? 'badge bg-warning text-dark' :
+                                              'badge bg-secondary')">
+                        </span>
+                    </div>
+                    <small class="text-muted">Раундів: <span th:text="${c.totalRounds}"></span></small>
+                </a>
+
+                <!-- Кнопка видалення -->
+                <form th:action="@{/admin/experiment/{id}/delete(id=${c.id})}"
+                      method="post" class="ms-3"
+                      onsubmit="return confirm('Видалити цю розмову?')">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                        🗑
+                    </button>
+                </form>
+
+            </div>
+        </div>
     </div>
 
 </div>

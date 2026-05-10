@@ -124,4 +124,10 @@ public class AgentConversationService {
         return ExperimentMapper.toResponse(conversation,
                 messageRepository.findByConversationIdOrderByRoundNumberAsc(id));
     }
+
+    @Transactional
+    public void deleteById(Long id) {
+        messageRepository.deleteByConversationId(id);
+        conversationRepository.deleteById(id);
+    }
 }

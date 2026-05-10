@@ -13,4 +13,7 @@ public interface AgentMessageRepository extends JpaRepository<AgentMessage, Long
     int countByConversationId(Long conversationId);
 
     boolean existsByConversationIdAndSender(Long conversationId, AgentSender sender);
+
+
+    void deleteByConversationId(Long id);
 }
